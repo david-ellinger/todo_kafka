@@ -19,3 +19,6 @@
 
 `python -m venv env`
 `env\Scripts\activate.bat`
+
+Install script locally
+`pip install --editable .`
