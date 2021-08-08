@@ -1,84 +1,109 @@
 from dotenv import load_dotenv
 import click
+from sqlalchemy.sql.sqltypes import STRINGTYPE
 from todoist_service import TodoistService
 import sqlite3
 from faker import Faker
 from sqlalchemy import create_engine
 from sqlalchemy import MetaData
 from sqlalchemy import Table
-from sqlalchemy import Column
-from sqlalchemy import Integer, String
-from sqlalchemy import Column, String, Integer
+from sqlalchemy import Column, String, Integer, Boolean
 from sqlalchemy import create_engine
 from sqlalchemy import event
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.ext.declarative import declarative_base
-load_dotenv() # take env variables from .env
+
+load_dotenv()  # take env variables from .env
 
 Base = declarative_base()
+
+
 class User(Base):
     __tablename__ = "user"
     id = Column(Integer, primary_key=True)
     name = Column(String)
     age = Column(Integer)
 
+
+class TodoTxt(Base):
+    __tablename__ = "todo"
+    id = Column(Integer, primary_key=True)
+    completed = Column(Boolean)
+    priority = Column(String)
+    description = Column(String)
+    completion_date = Column(String)
+    creation_date = Column(String)
+    project_tags = Column(String)  # TODO: Make this into its own table
+    context_tags = Column(String)
+    special_tags = Column(String)
+
+
 url = "sqlite:///todo.db"
 engine = create_engine(url)
 Base.metadata.create_all(bind=engine)
 Session = sessionmaker(bind=engine)
 
+
 @click.group()
 def cli():
     pass
+
 
 @cli.command()
 def sync():
     todoist = TodoistService()
     todoist.sync()
 
+
 # Examples / Test
 
+
 @cli.command()
-@click.option('--count', default=1, help='Number of greetings.')
-@click.option('--name', prompt='Your name',
-              help='The person to greet.')
+@click.option("--count", default=1, help="Number of greetings.")
+@click.option("--name", prompt="Your name", help="The person to greet.")
 def hello(count, name):
     """Simple program that greets NAME for a total of COUNT times."""
     for x in range(count):
         click.echo(f"Hello {name}!")
 
+
 @cli.command()
-def initdb():
-    #TODO: Initialize sqlite db
+@click.option("--todos", default=5, help="Number todo rows")
+def initdb(todos):
+    # TODO: Initialize sqlite db
     session = scoped_session(Session)
     fake = Faker()
 
-    for _ in range(1000):
-        user = User(name=fake.name(), age=fake.random_int(18,100))
+    for _ in range(5):
+        user = User(name=fake.name(), age=fake.random_int(18, 100))
         session.add(user)
+    for _ in range(todos):
+        task = TodoTxt(
+            completed=fake.boolean(),
+            priority=fake.random_uppercase_letter(),
+            completion_date=fake.date(),
+            creation_date=fake.date(),
+            description=fake.sentence(),
+            project_tags=f"{fake.random_uppercase_letter()}:{fake.random_uppercase_letter()},{fake.random_uppercase_letter()}:{fake.random_uppercase_letter()},{fake.random_uppercase_letter()}:{fake.random_uppercase_letter()}",
+            context_tags=f"{fake.random_uppercase_letter()}:{fake.random_uppercase_letter()},{fake.random_uppercase_letter()}:{fake.random_uppercase_letter()}",
+            special_tags=f"{fake.random_uppercase_letter()}:{fake.random_uppercase_letter()}",
+        )
+        session.add(task)
     session.commit()
-    # t1 = Table('Table_1', meta,
-    #         Column('id', Integer, primary_key=True),
-    #         Column('name',String))
-    # t2 = Table('Table_2', meta,
-    #         Column('id', Integer, primary_key=True),
-    #         Column('val',Integer))
-    # t1.create()
-    # t2.create()
-    # conn = sqlite3.connect('test.db')
-    # c = conn.cursor()
-    # c.execute("CREATE TABLE todo (id varchar(3), data json)")
-    click.echo('Initialized the database')
+    click.echo("Initialized the database")
+
 
 def add():
     pass
 
+
 @cli.command()
 def dropdb():
-    #TODO: Drop sqlite db
+    # TODO: Drop sqlite db
     Base.metadata.drop_all(bind=engine)
-    click.echo('Dropped the database')
+    click.echo("Dropped the database")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     cli()
