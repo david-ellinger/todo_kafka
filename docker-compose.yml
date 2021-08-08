@@ -1,9 +1,8 @@
 version: "3.8"
 services:
-  app:
+  todo_cli:
     build: .
-    image: my_image
+    image: todo_cli
     volumes:
-      - ./data:/home/app_user/data
-    stdin_open: true
-    tty: true
+      - .:/code
+    entrypoint: python app.py

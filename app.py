@@ -53,7 +53,7 @@ def cli():
 @cli.command()
 def add(description:str):
     task = TodoTxt(description=description)
-
+    print(f"Task: {task}")
 
 @cli.command()
 def sync():
@@ -88,7 +88,7 @@ def initdb(todos):
 
 
 def add():
-    
+
     pass
 
 
