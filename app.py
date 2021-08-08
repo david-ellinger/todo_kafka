@@ -1,6 +1,7 @@
+from datetime import datetime
 from dotenv import load_dotenv
 import click
-from sqlalchemy.sql.sqltypes import STRINGTYPE
+from sqlalchemy.sql.sqltypes import DateTime, STRINGTYPE
 from todoist_service import TodoistService
 import sqlite3
 from faker import Faker
@@ -29,14 +30,14 @@ class User(Base):
 class TodoTxt(Base):
     __tablename__ = "todo"
     id = Column(Integer, primary_key=True)
-    completed = Column(Boolean)
-    priority = Column(String)
+    completed = Column(Boolean, default=False)
+    priority = Column(String, nullable=True)
     description = Column(String)
-    completion_date = Column(String)
-    creation_date = Column(String)
-    project_tags = Column(String)  # TODO: Make this into its own table
-    context_tags = Column(String)
-    special_tags = Column(String)
+    completion_date = Column(DateTime, nullable=True)
+    creation_date = Column(DateTime, default=datetime.now())
+    project_tags = Column(String, nullable=True)  # TODO: Make this into its own table
+    context_tags = Column(String, nullable=True)
+    special_tags = Column(String, nullable=True)
 
 
 url = "sqlite:///todo.db"
@@ -49,23 +50,15 @@ Session = sessionmaker(bind=engine)
 def cli():
     pass
 
+@cli.command()
+def add(description:str):
+    task = TodoTxt(description=description)
+
 
 @cli.command()
 def sync():
     todoist = TodoistService()
     todoist.sync()
-
-
-# Examples / Test
-
-
-@cli.command()
-@click.option("--count", default=1, help="Number of greetings.")
-@click.option("--name", prompt="Your name", help="The person to greet.")
-def hello(count, name):
-    """Simple program that greets NAME for a total of COUNT times."""
-    for x in range(count):
-        click.echo(f"Hello {name}!")
 
 
 @cli.command()
@@ -95,6 +88,7 @@ def initdb(todos):
 
 
 def add():
+    
     pass
 
 

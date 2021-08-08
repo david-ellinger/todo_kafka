@@ -17,8 +17,20 @@
 
 # Commands
 
+## Package
+`task add TASK_DESCRIPTION`
+`task 1 delete`
+`task 1 done`
+`task 1 edit TASK_DESCRIPTION`
+`task list --todoist`
+`task list --db`
+
+## Local Development
 `python -m venv env`
 `env\Scripts\activate.bat`
 
 Install script locally
 `pip install --editable .`
+
+### Docker
+`docker-compose build`
