@@ -34,3 +34,7 @@ Install script locally
 
 ### Docker
 `docker-compose build`
+`docker-compose run --service-ports kafdrop`
+
+# References
+- https://dzone.com/articles/introduction-to-event-streaming-with-kafka-and-kaf-1
