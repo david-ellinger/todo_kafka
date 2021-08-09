@@ -36,7 +36,9 @@ Install script locally
 Kafdrop URL - http://localhost:9000/
 
 `docker-compose build`
+
 `docker-compose run --service-ports todo initdb`
+
 `docker-compose run --service-ports todo add`
 #### Consumer
 `docker-compose run --service-ports todo-consumer`
