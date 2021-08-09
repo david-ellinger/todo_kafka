@@ -6,6 +6,18 @@ services:
     volumes:
       - .:/code
     entrypoint: python app.py
+    depends_on:
+      - "kafdrop"
+
+  todo-consumer:
+    build: .
+    image: todo_consumer
+    volumes:
+      - .:/code
+    command: python app.py start-consumer
+    depends_on:
+      - "kafdrop"
+
   kafdrop:
     image: obsidiandynamics/kafdrop
     restart: "no"

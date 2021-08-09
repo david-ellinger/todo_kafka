@@ -1,3 +1,5 @@
+from app.consumer import Consumer
+from app.producer import Producer
 from datetime import datetime
 
 from sqlalchemy.orm.scoping import scoped_session
@@ -6,7 +8,7 @@ from app.todoist_service import TodoistService
 from dotenv import load_dotenv
 import click
 
-
+TODO_TOPIC = "topic-test"
 load_dotenv()  # take env variables from .env
 
 
@@ -14,10 +16,6 @@ load_dotenv()  # take env variables from .env
 def cli():
     pass
 
-@cli.command()
-def add(description:str):
-    task = TodoTxt(description=description)
-    print(f"Task: {task}")
 
 @cli.command()
 def sync():
@@ -31,15 +29,21 @@ def initdb(todos):
     populate_database()
     click.echo("Initialized the database")
 
-
+@cli.command()
 def add():
-    pass
+    produce = Producer()
+    produce.produce("test", TODO_TOPIC)
 
 
 @cli.command()
 def dropdb():
     drop()
     click.echo("Dropped the database")
+
+@cli.command()
+def start_consumer():
+    consumer = Consumer()
+    consumer.consume()
 
 if __name__ == "__main__":
     cli()
