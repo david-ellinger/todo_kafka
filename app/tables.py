@@ -9,8 +9,10 @@ from sqlalchemy.orm import scoped_session
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 from faker import Faker
+import click
 
 from sqlalchemy.sql.sqltypes import DateTime
+import logging
 fake = Faker()
 
 Base = declarative_base()
@@ -38,7 +40,9 @@ class TodoTxt(Base):
     context_tags = Column(String, nullable=True)
     special_tags = Column(String, nullable=True)
 
-def populate_database(users=5, todos=5):
+def populate_database(users:int=5, todos:int=5):
+    click.echo("Starting populate database")
+    Base.metadata.create_all(bind=engine)
     session = scoped_session(Session)
     for _ in range(5):
         user = User(name=fake.name(), age=fake.random_int(18, 100))
@@ -56,6 +60,7 @@ def populate_database(users=5, todos=5):
         )
         session.add(task)
     session.commit()
+    click.echo("Finished populate database")
 
 def drop():
     Base.metadata.drop_all(bind=engine)
