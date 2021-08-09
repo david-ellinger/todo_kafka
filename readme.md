@@ -17,8 +17,33 @@
 
 # Commands
 
+## Package
+`task add TASK_DESCRIPTION`
+`task 1 delete`
+`task 1 done`
+`task 1 edit TASK_DESCRIPTION`
+`task list --todoist`
+`task list --db`
+
+## Local Development
 `python -m venv env`
 `env\Scripts\activate.bat`
 
 Install script locally
 `pip install --editable .`
+
+### Docker
+Kafdrop URL - http://localhost:9000/
+
+`docker-compose build`
+`docker-compose run --service-ports todo initdb`
+`docker-compose run --service-ports todo add`
+#### Consumer
+`docker-compose run --service-ports todo-consumer`
+
+
+
+
+
+# References
+- https://dzone.com/articles/introduction-to-event-streaming-with-kafka-and-kaf-1
