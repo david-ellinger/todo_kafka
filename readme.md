@@ -17,14 +17,19 @@
 
 # Commands
 
-## Package
-`task add TASK_DESCRIPTION`
-`task 1 delete`
-`task 1 done`
-`task 1 edit TASK_DESCRIPTION`
-`task list --todoist`
-`task list --db`
-
+## Schema
+`todo` - Show Help\
+`todo --help` - Show Help\
+`todo db --help` Show DB commands\
+`todo db init` - Add mock data\
+`todo db drop` - Remove mock data\
+`todo db status` - List all tasks from db - Name | Project | # of Subtasks
+`todo db backup` - Backup db (??)
+`todo status` - List all open tasks - Name | Project | # of Subtasks and shows the Provider (TodoistProvider default)
+`todo sync **TODOIST_TASK_ID**` - Adds todoist task to local db
+`todo add *description string*` - Adds task to todoist. Default behavior
+`todo add --description *descrition string*` - Same behavior as above.
+`todo edit --task *todoist_task_id* --description "new description"` - Edit todoist task w/ new description
 ## Local Development
 `python -m venv env`
 `env\Scripts\activate.bat`
