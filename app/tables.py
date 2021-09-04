@@ -4,13 +4,14 @@ from sqlalchemy import Table
 from sqlalchemy import Column, String, Integer, Boolean
 from sqlalchemy import create_engine
 from sqlalchemy import event
+from sqlalchemy.ext import declarative
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 from faker import Faker
 import click
-
+import logging
 from sqlalchemy.sql.sqltypes import DateTime
 import logging
 fake = Faker()
@@ -20,6 +21,23 @@ url = "sqlite:///todo.db"
 engine = create_engine(url)
 Base.metadata.create_all(bind=engine)
 Session = sessionmaker(bind=engine)
+logger = logging.getLogger(__name__)
+
+def keyvalgen(obj):
+    """ Generate attr name/val pairs, filtering out SQLA attrs."""
+    excl = ('_sa_adapter', '_sa_instance_state')
+    for k, v in vars(obj).items():
+        if not k.startswith('_') and not any(hasattr(v, a) for a in excl):
+            yield k, v
+class BaseModel(object):
+
+    __abstract__ = True
+
+    def __repr__(self):
+        params = ', '.join(f'{k}={v}' for k, v in keyvalgen(self))
+        return f"{self.__class__.__name__}({params})"
+
+Base = declarative.declarative_base(cls=BaseModel)
 
 class User(Base):
     __tablename__ = "user"
@@ -40,13 +58,15 @@ class TodoTxt(Base):
     context_tags = Column(String, nullable=True)
     special_tags = Column(String, nullable=True)
 
+
 def populate_database(users:int=5, todos:int=5):
-    click.echo("Starting populate database")
+    click.echo("Starting populate database...")
     Base.metadata.create_all(bind=engine)
     session = scoped_session(Session)
     for _ in range(5):
         user = User(name=fake.name(), age=fake.random_int(18, 100))
         session.add(user)
+        click.echo(f"Added user {user}")
     for _ in range(todos):
         task = TodoTxt(
             completed=fake.boolean(),
@@ -59,8 +79,12 @@ def populate_database(users:int=5, todos:int=5):
             special_tags=f"{fake.random_uppercase_letter()}:{fake.random_uppercase_letter()}",
         )
         session.add(task)
+        click.echo(f"Added task {task}")
+
     session.commit()
     click.echo("Finished populate database")
 
 def drop():
     Base.metadata.drop_all(bind=engine)
+    click.echo("Dropped database")
+
